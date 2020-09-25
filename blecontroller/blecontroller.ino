@@ -12,7 +12,7 @@ bool oldDeviceConnected = false;
 
 uint8_t frameCounter = 0;
 
-#define DEVICE_NAME         "IIDX Entry model"
+#define DEVICE_NAME         "IIDX Entry model" // or "SOUND VOLTEX controller Entry Model"
 #define SERVICE_UUID        "ff00"
 #define CHARACTERISTIC_UUID "ff01"
 
@@ -66,22 +66,37 @@ void setup() {
 }
 
 
-uint8_t turntableValue = 0;
+// Sensor A is for turntable in IIDX
+// Sensor A and B are L and R knobs respectively for SDVX
+uint8_t sensorA = 0, sensorB = 0;
 
 /*
-  0x01 Button 1
-  0x02 Button 2
-  0x04 Button 3
-  0x08 Button 4
-  0x10 Button 5
-  0x20 Button 6
-  0x40 Button 7
+  IIDX:
+    0x01 Button 1
+    0x02 Button 2
+    0x04 Button 3
+    0x08 Button 4
+    0x10 Button 5
+    0x20 Button 6
+    0x40 Button 7
+    
+  SDVX:
+    0x01 BT-A
+    0x02 BT-B
+    0x04 BT-C
+    0x08 BT-D
+    0x10 FX-L
+    0x20 FX-R
  */
 uint8_t keyPress1 = 0;
 
 /*
-  0x01 E1
-  0x02 E2
+  IIDX:
+    0x01 E1
+    0x02 E2
+
+  SDVX:
+    0x01 Start
  */
 uint8_t keyPress2 = 0;
 
@@ -100,8 +115,8 @@ void loop() {
         // Send key press updates as much as possible to the game.
         // Each notification contains two frames worth of updates.
         uint8_t values[10] = { 
-          turntableValue, 0x00, keyPress1, keyPress2, frameCounter++,
-          turntableValue, 0x00, keyPress1, keyPress2, frameCounter++,
+          sensorA, sensorB, keyPress1, keyPress2, frameCounter++,
+          sensorA, sensorB, keyPress1, keyPress2, frameCounter++,
         };
 
         pCharacteristic->setValue(values, 10);
