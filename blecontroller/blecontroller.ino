@@ -10,8 +10,6 @@ BLECharacteristic* pCharacteristic = NULL;
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
 
-uint8_t frameCounter = 0;
-
 #define DEVICE_NAME         "IIDX Entry model" // or "SOUND VOLTEX controller Entry Model"
 #define SERVICE_UUID        "ff00"
 #define CHARACTERISTIC_UUID "ff01"
@@ -61,7 +59,6 @@ void setup() {
   pAdvertising->setScanResponse(true);
   BLEDevice::startAdvertising();
   
-  frameCounter = 0;
   Serial.println("Waiting a client connection to notify...");
 }
 
@@ -100,6 +97,7 @@ uint8_t keyPress1 = 0;
  */
 uint8_t keyPress2 = 0;
 
+uint8_t frameCounter = 0;
 
 void loop() {
     // Add your button update code here    
