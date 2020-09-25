@@ -29,6 +29,10 @@ class MyServerCallbacks: public BLEServerCallbacks {
 void setup() {
   Serial.begin(115200);
 
+  // Add your button init code here
+  pinMode(0, INPUT_PULLUP); // Button
+  pinMode(16, OUTPUT); // LED
+
   // Create the BLE Device
   BLEDevice::init(DEVICE_NAME);
 
@@ -82,25 +86,16 @@ uint8_t keyPress1 = 0;
 uint8_t keyPress2 = 0;
 
 
-uint32_t keyAnim = 0;
-uint8_t keyValues[] = {
-  0x00, // 0
-  0x01, // 1
-  0x01 | 0x02,  // 2
-  0x01 | 0x02 | 0x04,  // 3
-  0x01 | 0x02 | 0x04 | 0x08,  // 4
-  0x01 | 0x02 | 0x04 | 0x08 | 0x10, // 5
-  0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20,  // 6
-  0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40, // 7
-  0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20,  // 8
-  0x01 | 0x02 | 0x04 | 0x08 | 0x10, // 9
-  0x01 | 0x02 | 0x04 | 0x08,  // 10
-  0x01 | 0x02 | 0x04,  // 11
-  0x01 | 0x02,  // 12
-  0x01, // 13
-};
-
 void loop() {
+    // Add your button update code here    
+    if (digitalRead(0) == LOW) {
+      digitalWrite(16, LOW);
+      keyPress1 = 0x01;
+    } else {
+      digitalWrite(16, HIGH);
+      keyPress1 &= ~0x01;
+    }
+
     if (deviceConnected) {
         // Send key press updates as much as possible to the game.
         // Each notification contains two frames worth of updates.
@@ -109,20 +104,10 @@ void loop() {
           turntableValue, 0x00, keyPress1, keyPress2, frameCounter++,
         };
 
-        if ((frameCounter % 30) == 0) {
-          keyPress1 = keyValues[keyAnim];
-
-          keyAnim++;
-          
-          if (keyAnim > 13) {
-            keyAnim = 0;
-          }
-        }
-        
         pCharacteristic->setValue(values, 10);
         pCharacteristic->notify();
         
-        delay(1);
+        delay(50); // TODO: Adjust for more optimal latency. Setting this too low will flood the Bluetooth stack, resulting in inputs being dropped/not sent in time
     }
     
     // disconnecting
